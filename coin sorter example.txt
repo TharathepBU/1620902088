@@ -1,0 +1,170 @@
+/*
+Coin Counter by Michael Illingby May 18th, 2014
+michael.i@me.com
+Pins defined below.
+
+Scope of project: After sorting coins using a method not handled below, have
+them fall past a trigger that closes to ground, count the coin, and then add
+it's value to a running total.
+
+Go Canucks!
+Cheers
+*/
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I2C address
+
+// this constant won't change:
+const int  coin1Pin = 2;   // the pin that the 1 pushcoin is attached to
+const int  coin5Pin = 3;    // the pin that the 5 pushcoin is attached to
+const int  coin10Pin = 4;    // the pin that the 10 pushcoin is attached to
+const int  coin25Pin = 5;     // the pin that the 25 pushcoin is attached to
+const int  coin100Pin = 6;     // the pin that the 100 pushcoin is attached to
+const int  coin200Pin = 7;      // the pin that the 200 pushcoin is attached to
+const int  led1 = 8;       // the pin that the Penny LED is attached to
+const int  led5 = 9;        // the pin that the Nickle LED is attached to
+const int  led10 = 10;       // the pin that the Dime LED is attached to
+const int  led25 = 11;        // the pin that the Quarter LED is attached to
+const int  led100 = 12;        // the pin that the Loonie LED is attached to
+const int  led200 = 13;         // the pin that the Toonie LED is attached to
+
+// Variables will change:
+unsigned long  coin1counter = 0;  //  counter for the number of $0.01 coins
+unsigned long  coin5counter = 0;   //   counter for the number of $0.05 coins
+unsigned long  coin10counter = 0;   //    counter for the number of $0.10 coins
+unsigned long  coin25counter = 0;    //     counter for the number of $0.25 coins
+unsigned long  coin100counter = 0;    //      counter for the number of $1.00 coins
+unsigned long  coin200counter = 0;     //       counter for the number of $2.00 coins
+
+// Here we will store the totals
+
+float coin1total = coin1counter*0.01;  // Math for Calculating value of a Penny in relation to a dollar
+float coin5total = coin5counter*0.05;   // Math for Calculating value of a Nickle in relation to a dollar
+float coin10total = coin10counter*0.10;  // Math for Calculating value of a Dime in relation to a dollar
+float coin25total = coin25counter*0.25;   // Math for Calculating value of a Quarter in relation to a dollar
+float coin100total = coin100counter*1.0;   // Math for Calculating value of a Loonie in relation to a dollar
+float coin200total = coin200counter*2.00;   // Math for Calculating value of a Toonie in relation to a dollar
+int totalcoins = coin1counter+coin5counter+coin10counter+coin25counter+coin100counter+coin200counter;
+float totalcash = coin1total+coin5total+coin10total+coin25total+coin100total+coin200total;
+
+void setup() {
+ // initialize the coin pin as a input:
+ pinMode(coin1Pin, INPUT_PULLUP);
+ pinMode(coin5Pin, INPUT_PULLUP);
+ pinMode(coin10Pin, INPUT_PULLUP);
+ pinMode(coin25Pin, INPUT_PULLUP);
+ pinMode(coin100Pin, INPUT_PULLUP);
+ pinMode(coin200Pin, INPUT_PULLUP);
+ pinMode(led1, OUTPUT);  // initialize the LED as an output:
+ pinMode(led5, OUTPUT);  // initialize the LED as an output:
+ pinMode(led10, OUTPUT);  // initialize the LED as an output:
+ pinMode(led25, OUTPUT);  // initialize the LED as an output:
+ pinMode(led100, OUTPUT);  // initialize the LED as an output:
+ pinMode(led200, OUTPUT);  // initialize the LED as an output:
+ 
+ lcd.begin(16,2);
+ lcd.setCursor(0,0);
+ lcd.print("Coin Counter");
+ lcd.setCursor(0,1);
+ lcd.print("Starting.");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting..");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting...");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting....");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting.....");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting......");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting.......");
+ delay(100);
+ lcd.setCursor(0,1);
+ lcd.print("Starting........");
+ delay(100);
+ lcd.clear();
+ lcd.setCursor(0,0);
+ lcd.print("Insert Coins Now");
+ delay(1000);
+ lcd.clear();
+}
+
+
+void loop() {
+   //read button states and make sure we are really seeing a coin drop.
+
+     int coin1_state = digitalRead(coin1Pin);
+     int coin5_state = digitalRead(coin5Pin);
+     int coin10_state = digitalRead(coin10Pin);
+     int coin25_state = digitalRead(coin25Pin);
+     int coin100_state = digitalRead(coin100Pin);
+     int coin200_state = digitalRead(coin200Pin);
+
+
+//debounce & process
+
+delay (100); // this should give us the correct timing for 1 coin every 200ms which is 5 coins a second.
+
+// Here we will start looking for coins and adding them up.
+ if (coin1_state == LOW && digitalRead(coin1Pin == LOW)) {  
+     coin1counter ++; // if the coin is detected, increment the counter
+     digitalWrite(led1, HIGH);
+}
+ if (coin5_state == LOW && digitalRead(coin5Pin == LOW)) {  
+     coin5counter++; // if the coin is detected, increment the counter
+     digitalWrite(led5, HIGH);
+}
+ if (coin10_state == LOW && digitalRead(coin10Pin == LOW)) {  
+     coin10counter++; // if the coin is detected, increment the counter
+     digitalWrite(led10, HIGH);
+}
+ if (coin25_state == LOW && digitalRead(coin25Pin == LOW)) {  
+     coin25counter++; // if the coin is detected, increment the counter
+     digitalWrite(led25, HIGH);
+}
+ if (coin100_state == LOW && digitalRead(coin100Pin == LOW)) {  
+     coin100counter++; // if the coin is detected, increment the counter
+     digitalWrite(led100, HIGH);
+}
+ if (coin200_state == LOW && digitalRead(coin200Pin == LOW)) {  
+     coin200counter++; // if the coin is detected, increment the counter
+     digitalWrite(led200, HIGH);
+}
+     UpdateTotals();
+     lcd.print("                ");
+     lcd.setCursor(0,0);
+     lcd.print("Cash $:");
+     lcd.print(totalcash);
+     lcd.setCursor(0,1);
+     lcd.print("# of Coins:");
+     lcd.print(totalcoins);
+     digitalWrite(led1, LOW);
+     digitalWrite(led5, LOW);
+     digitalWrite(led10, LOW);
+     digitalWrite(led25, LOW);
+     digitalWrite(led100, LOW);
+     digitalWrite(led200, LOW);
+
+
+
+ //delay(100);
+}
+void UpdateTotals(){
+
+coin1total = coin1counter*0.01;
+coin5total = coin5counter*0.05;
+coin10total = coin10counter*0.10;
+coin25total = coin25counter*0.25;
+coin100total = coin100counter*1.00;
+coin200total = coin200counter*2.00;
+totalcoins = coin1counter+coin5counter+coin10counter+coin25counter+coin100counter+coin200counter;
+totalcash = coin1total+coin5total+coin10total+coin25total+coin100total+coin200total;
+}

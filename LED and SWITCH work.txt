@@ -1,0 +1,28 @@
+const int led13 = 13;
+const int bp = 6;
+int state = 0;
+
+void setup() {
+  pinMode(led13,OUTPUT);
+  pinMode(bp,INPUT);
+}
+
+void loop() {
+ 
+  if(digitalRead(bp))
+  {
+    while(digitalRead(bp));
+    state++;
+  }
+  
+  if(state==1)
+  {
+    digitalWrite(led13,HIGH);
+  }
+  if(state >= 2)
+  {
+    digitalWrite(led13,LOW);
+    state = 0;
+  } 
+
+}
