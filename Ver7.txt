@@ -1,0 +1,134 @@
+
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);   
+int sensor1 = 2;
+int sensor2 = 3;
+char key = '0' ;
+const int led13 = 13;
+const int button1 = 6;
+int state = 0;
+void setup() {
+  pinMode(sensor1, INPUT);
+  attachInterrupt(0, doCounter1, FALLING);
+  pinMode(sensor2, INPUT);
+  attachInterrupt(1, doCounter2, FALLING);
+  pinMode(led13,OUTPUT);
+  pinMode(button1,INPUT);
+  lcd.begin();
+  lcd.home();
+  lcd.clear();
+  lcd.print("Insert Coin...");
+  lcd.setCursor(0, 1);
+  lcd.print("5 or 10 Bath");
+  Serial.begin(9600);
+}
+boolean isCounter1 = false;
+int count = 0;
+int value = 0;
+boolean isCounter2 = false;
+void loop() {
+  if (Serial.available() > 0) 
+  { 
+    key = Serial.read(); 
+  }
+  if (isCounter1 == true) {
+    isCounter1 = false;
+    lcd.clear();
+  lcd.print(count);
+  }
+ if (isCounter2 == true) {
+    isCounter2 = false;
+    lcd.clear();
+  lcd.print(count);
+  }
+  if (value <= 0)
+  {
+    lcd.clear();
+    lcd.print("Insert Coin...");
+    lcd.setCursor(0, 1);
+    lcd.print("5 or 10 Bath");
+    Serial.println("Inset Coin...");
+    digitalWrite(led13,LOW);
+    delay(1000);
+  }
+  if (value >= 20)
+  {
+    Serial.println("\nA available : Press (2)");
+    digitalWrite(led13,HIGH);
+    delay(1000);
+  }
+  if (value >= 30)
+  {
+    Serial.println("B available : Press (3)");
+    delay(1000);
+  }
+  if (value >= 40)
+  {
+    Serial.println("C available : Press (4)");
+    delay(1000);
+  }
+  if (key == '2')
+  {
+    Serial.println("Thank You for AAA");
+    count-=20;
+    value-=20;
+    lcd.clear();
+    lcd.print("Exchange: ");
+    lcd.print(count);
+  }
+  if (key == '3')
+  {
+    Serial.println("Thank You for BBB");
+    count-=30;
+    value-=30;
+    lcd.clear();
+    lcd.print("Exchange: ");
+    lcd.print(count);
+  }
+  if (key == '4')
+  {
+    Serial.println("Thank You for CCC");
+    count-=40;
+    value-=40;
+    lcd.clear();
+    lcd.print("Exchange: ");
+    lcd.print(count);
+  }
+  if (key == '9')
+  {
+    lcd.clear();
+    lcd.print("Exchange: ");
+    lcd.print(count);
+    Serial.print("\n*******Reset******\n");
+    delay(5000);
+    lcd.clear();
+    lcd.print("Insert Coin...");
+    lcd.setCursor(0, 1);
+    lcd.print("5 or 10 Bath");
+    count-=count;
+    value-=value;
+  }
+  if(digitalRead(button1))
+  {
+    while(digitalRead(button1));
+    
+    Serial.println("Thank You for DDD");
+    count-=50;
+    value-=50;
+    lcd.clear();
+    lcd.print("Exchange: ");
+    lcd.print(count);
+  }
+  
+   
+}
+void doCounter1() {
+  isCounter1 = true;
+  count+=5;
+  value+=5;
+}
+void doCounter2() {
+  isCounter2 = true;
+  count+=10;
+  value+=10;
+}
